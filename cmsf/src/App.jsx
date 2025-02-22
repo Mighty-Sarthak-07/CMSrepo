@@ -8,6 +8,7 @@ import Footer from "./components/Footer";
 import Auth from "./components/Auth";
 import Carousel from "./components/Carousel";
 import AdminDashboard from "./components/AdminDashboard";
+import ContactUs from "./components/ContactUs";
 
 function App() {
   const token = localStorage.getItem("token"); // ✅ Check if user is logged in
@@ -32,6 +33,9 @@ function App() {
           path="/admindashboard" 
           element={token ? <AdminDashboard /> : <Navigate to="/login" />} 
         />
+
+        {/* ✅ Contact Us Route */}
+        <Route path="/contact-us" element={<ContactUs />} />
 
         {/* ✅ Redirect unknown routes to home */}
         <Route path="*" element={<Navigate to="/" />} />
