@@ -6,8 +6,11 @@ import NavBar from "./components/Navbar";
 import SubmitComplaint from "./components/SubmitComplaint";
 import Footer from "./components/Footer";
 import Auth from "./components/Auth";
-import Carousel from "./components/Carousel";
 import AdminDashboard from "./components/AdminDashboard";
+import Chatbot from "./components/Chatbot"; 
+import ErrorBoundary from "./components/ErrorBoundary";
+import ContactUs from "./components/Contact";
+import FAQs from "./components/FAQs";
 
 function App() {
   const token = localStorage.getItem("token"); // ✅ Check if user is logged in
@@ -19,13 +22,23 @@ function App() {
       <Routes>
         {/* ✅ Public Routes */}
         <Route path="/" element={
-          <main className="relative min-h-screen w-screen overflow-x-hidden">
+          <main className="relative min-h-screen min-w-full overflow-x-hidden p-4 sm:p-6 md:p-8 lg:p-10">
             <Home />
-            <Carousel />
           </main>
         } />
         <Route path="/submit-complaint" element={<SubmitComplaint />} /> 
         <Route path="/auth" element={<Auth />} /> 
+        <Route path="/contactus" element={<ContactUs />} /> 
+        <Route path="/faqs" element={<FAQs />} />
+        <Route path="/" element={<Home />} />
+        <Route
+          path="/chatbot"
+          element={
+            <ErrorBoundary>
+              <Chatbot />
+            </ErrorBoundary>
+          }
+        />
 
         {/* ✅ Protected Route (Only for logged-in users) */}
         <Route 
@@ -33,7 +46,7 @@ function App() {
           element={token ? <AdminDashboard /> : <Navigate to="/login" />} 
         />
 
-        {/* ✅ Redirect unknown routes to home */}
+        
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
 

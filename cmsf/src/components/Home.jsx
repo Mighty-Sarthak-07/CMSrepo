@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { FaWifi, FaLightbulb, FaTools, FaBolt, FaBuilding } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import Footer from "./Footer";
 
 const complaintsData = [
   { id: 1, title: "Wi-Fi Connectivity Issue", department: "IT Department", status: "Pending", time: "2 hours ago", icon: <FaWifi />, administrator: "Admin John Doe", details: "Wi-Fi is down in hostel area." },
@@ -19,7 +18,7 @@ const Home = () => {
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }} className="bg-black text-white p-6 rounded-lg">
         <h1 className="text-2xl font-bold">How to File a Complaint</h1>
         <p className="my-3 mb-6">Follow these simple steps to submit your complaint and track its progress</p>
-        <Link to="/submit-complaint" className="mt-4 px-4 py-2 bg-white text-black rounded-md">File a Complaint</Link>
+        <Link to="/submit-complaint"><button className="mt-4 px-4 py-2 bg-white text-black rounded-md hover:scale-105 ease-in-out duration-400">File a Complaint</button></Link>
       </motion.div>
 
       <div className="grid grid-cols-3 gap-4 my-6">
@@ -65,7 +64,6 @@ const Home = () => {
           </div>
         </div>
       )}
-      <Footer/>
     </div>
   );
 };

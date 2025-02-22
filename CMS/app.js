@@ -13,20 +13,16 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
 app.use(cors({ origin: "*" }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const upload = multer();
-app.use(upload.none());  // ✅ Moved this AFTER app is initialized
-
-// Routes
+app.use(upload.none());
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", authenticateUser, authorizeAdmin, adminRoutes);
 app.use("/api/complaints", authenticateUser, complaintRoutes);
 
-// MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected"))
   .catch(err => console.error("❌ MongoDB Connection Error:", err));

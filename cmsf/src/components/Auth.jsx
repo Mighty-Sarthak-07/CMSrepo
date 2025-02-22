@@ -25,7 +25,10 @@ const Auth = () => {
 
     try {
       const url = `${baseURL}/${isLogin ? "login" : "signup"}`;
-      const requestData = isLogin ? { email: formData.email, password: formData.password } : formData;
+      const requestData = isLogin
+        ? { email: formData.email, password: formData.password }
+        : formData;
+
       const { data } = await axios.post(url, requestData);
 
       if (isLogin) {
@@ -57,10 +60,12 @@ const Auth = () => {
           )}
           <input type="email" name="email" placeholder="Email" onChange={handleChange} className="w-full p-3 mb-4 border rounded-lg" required />
           <input type="password" name="password" placeholder="Password" onChange={handleChange} className="w-full p-3 mb-4 border rounded-lg" required />
-          <select name="role" onChange={handleChange} className="w-full p-3 mb-4 border rounded-lg bg-white">
-            <option value="student">Student</option>
-            <option value="admin">Admin</option>
-          </select>
+          {!isLogin && (
+            <select name="role" value={formData.role} onChange={handleChange} className="w-full p-3 mb-4 border rounded-lg bg-white">
+              <option value="student">Student</option>
+              <option value="admin">Admin</option>
+            </select>
+          )}
           {error && <p className="text-red-500">{error}</p>}
           <motion.button
             whileHover={{ scale: 1.05 }}

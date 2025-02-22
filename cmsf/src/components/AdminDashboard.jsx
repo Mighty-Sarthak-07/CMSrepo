@@ -18,19 +18,18 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     if (!token) {
+      console.warn("No token found, redirecting...");
       window.location.href = "/auth"; // Redirect if not logged in
       return;
     }
 
     const fetchData = async () => {
       try {
+        const headers = { Authorization: `Bearer ${token}` };
+
         const [complaintsResponse, adminResponse] = await Promise.all([
-          axios.get("http://localhost:5000/api/admin/complaints", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get("http://localhost:5000/api/admin/profile", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
+          axios.get("http://localhost:5000/api/admin/complaints", { headers }),
+          axios.get("http://localhost:5000/api/admin/profile", { headers }),
         ]);
 
         setComplaints(complaintsResponse.data);
@@ -38,11 +37,14 @@ const AdminDashboard = () => {
         setProfilePic(adminResponse.data.profilePic);
       } catch (error) {
         console.error("Error fetching data:", error);
-        setError("Unauthorized. Please log in again.");
-        setTimeout(() => {
+
+        if (error.response && error.response.status === 401) {
           localStorage.removeItem("token");
+          alert("Session expired. Please log in again.");
           window.location.href = "/auth";
-        }, 2000);
+        } else {
+          setError("Failed to fetch data. Please try again.");
+        }
       } finally {
         setLoading(false);
       }
@@ -57,11 +59,9 @@ const AdminDashboard = () => {
   // ✅ Save profile changes
   const handleProfileUpdate = async () => {
     try {
-      await axios.put(
-        "http://localhost:5000/api/admin/profile",
-        admin,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axios.put("http://localhost:5000/api/admin/profile", admin, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       alert("Profile updated successfully.");
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -116,9 +116,21 @@ const AdminDashboard = () => {
           <div className="flex flex-col mx-3">
             {edit ? (
               <>
-                <input type="text" value={admin.name} onChange={(e) => setAdmin({ ...admin, name: e.target.value })} className="border p-1 rounded" />
-                <input type="text" value={admin.designation} onChange={(e) => setAdmin({ ...admin, designation: e.target.value })} className="border p-1 rounded mt-1" />
-                <button onClick={handleProfileUpdate} className="mt-2 p-2 bg-blue-500 text-white rounded">Save</button>
+                <input
+                  type="text"
+                  value={admin.name}
+                  onChange={(e) => setAdmin({ ...admin, name: e.target.value })}
+                  className="border p-1 rounded"
+                />
+                <input
+                  type="text"
+                  value={admin.designation}
+                  onChange={(e) => setAdmin({ ...admin, designation: e.target.value })}
+                  className="border p-1 rounded mt-1"
+                />
+                <button onClick={handleProfileUpdate} className="mt-2 p-2 bg-blue-500 text-white rounded">
+                  Save
+                </button>
               </>
             ) : (
               <>
@@ -130,7 +142,9 @@ const AdminDashboard = () => {
         </div>
 
         <div className="flex gap-2">
-          <button className="p-2 bg-gray-200 rounded" onClick={handleEdit}><FaUserEdit className="text-2xl mx-2" /></button>
+          <button className="p-2 bg-gray-200 rounded" onClick={handleEdit}>
+            <FaUserEdit className="text-2xl mx-2" />
+          </button>
           <button className="p-2 bg-black text-white rounded relative" onClick={() => setSettingsOpen(!settingsOpen)}>
             <FaCog className="text-2xl mx-2" />
           </button>
@@ -153,8 +167,13 @@ const AdminDashboard = () => {
             <input type="file" accept="image/*" onChange={handleFileChange} className="mb-4" />
             {selectedFile && <p className="text-sm text-gray-600">{selectedFile.name}</p>}
             <div className="flex justify-center gap-4 mt-4">
-              <button className="px-4 py-2 bg-green-500 text-white rounded-lg" onClick={handleUpload}><FaUpload className="inline mr-2" />Upload</button>
-              <button className="px-4 py-2 bg-gray-500 text-white rounded-lg" onClick={() => setShowUploadPopup(false)}>Cancel</button>
+              <button className="px-4 py-2 bg-green-500 text-white rounded-lg" onClick={handleUpload}>
+                <FaUpload className="inline mr-2" />
+                Upload
+              </button>
+              <button className="px-4 py-2 bg-gray-500 text-white rounded-lg" onClick={() => setShowUploadPopup(false)}>
+                Cancel
+              </button>
             </div>
           </div>
         </div>

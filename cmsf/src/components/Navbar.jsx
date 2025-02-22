@@ -23,10 +23,11 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white shadow flex justify-between items-center p-4 relative">
-      <h1 className="text-xl font-bold text-blue-600">Student CMS</h1>
+    <nav className="bg-white shadow flex justify-between items-center p-4 relative w-full">
+      <Link to = {"/"}><h1 className="text-xl font-bold text-blue-600">Student CMS</h1></Link>
 
       <div className="flex items-center gap-4">
+        <Link to= {"/chatbot"} ><div>Chatbot</div></Link>
         <div className="relative cursor-pointer" onClick={() => setIsNotificationOpen(!isNotificationOpen)}>
           <FaBell size={24} />
           {notifications.length > 0 && (
