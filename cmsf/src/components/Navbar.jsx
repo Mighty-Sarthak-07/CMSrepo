@@ -4,6 +4,7 @@ import { FaBell, FaUserCircle } from "react-icons/fa";
 import { IoMdLogIn, IoMdLogOut } from "react-icons/io";
 import { CgProfile } from "react-icons/cg";
 
+
 const Navbar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
@@ -24,7 +25,7 @@ const Navbar = () => {
 
   return (
     <nav className="bg-white shadow flex justify-between items-center p-4 relative w-full">
-      <Link to = {"/"}><h1 className="text-xl font-bold text-blue-600">Student CMS</h1></Link>
+      <Link to = {"/home"}> <h1 className="text-xl font-bold text-blue-600">Student CMS</h1></Link>
 
       <div className="flex items-center gap-4">
         <Link to= {"/chatbot"} ><div>Chatbot</div></Link>

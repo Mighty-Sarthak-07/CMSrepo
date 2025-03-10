@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { FaCamera, FaGlassCheers } from "react-icons/fa";
@@ -6,59 +6,58 @@ import { FaCamera, FaGlassCheers } from "react-icons/fa";
 const carouselData = [
   {
     id: 1,
-    title: "About Us",
-    desc: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+    title: "Our Mission",
+    desc: "Empowering students to report and resolve campus issues efficiently by providing a seamless and transparent complaint management system.",
     icon: <FaCamera size={32} color="#fff" />, 
     bgColor: "#E74C3C", 
   },
   {
     id: 2,
-    title: "About Us",
-    desc: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
+    title: "Who Can Use This Portal",
+    desc: "All enrolled students can file complaints related to campus facilities, including WiFi, electricity, maintenance, and equipment issues.",
     icon: <FaGlassCheers size={32} color="#fff" />,
     bgColor: "#8E44AD", 
   },
   {
     id: 3,
-    title: "About Us",
-    desc: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+    title: "Types of Complaints We Address",
+    desc: "Electrical faults and power outages, Faulty or damaged equipment, Maintenance problems (hostels, classrooms, etc.)",
     icon: <FaCamera size={32} color="#fff" />,
     bgColor: "#3498DB", 
   }
 ];
 
 const Carousel = () => {
-  const [activeSlide, setActiveSlide] = useState(1);
+  const [activeSlide, setActiveSlide] = useState(0);
 
-  const next = () => {
-    if (activeSlide < carouselData.length - 1) {
-      setActiveSlide(activeSlide + 1);
-    }
-  };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % carouselData.length);
+    }, 3000);
 
-  const prev = () => {
-    if (activeSlide > 0) {
-      setActiveSlide(activeSlide - 1);
-    }
-  };
+    return () => clearInterval(interval);
+  }, []);
+
+  const next = () => setActiveSlide((prev) => (prev + 1) % carouselData.length);
+  const prev = () => setActiveSlide((prev) => (prev - 1 + carouselData.length) % carouselData.length);
 
   const getStyles = (index) => {
     return {
       position: "absolute",
       transition: "transform 0.5s ease, opacity 0.5s ease",
       opacity: activeSlide === index ? 1 : 0.8,
-      transform: `translateX(${(index - activeSlide) * 240}px) scale(${activeSlide === index ? 1 : 0.9})`,
+      transform: `translateX(${(index - activeSlide) * 100}%) scale(${activeSlide === index ? 1 : 0.9})`,
       zIndex: activeSlide === index ? 10 : 9,
     };
   };
 
   return (
-    <div className="relative flex justify-center items-center w-screen h-screen bg-black">
-      <div className="relative h-64 flex justify-center items-center">
+    <div className="relative flex justify-center items-center w-full h-[500px] bg-black overflow-hidden p-4 md:p-8">
+      <div className="relative h-full flex justify-center items-center w-full">
         {carouselData.map((item, index) => (
           <motion.div
             key={item.id}
-            className="absolute w-[450px] h-[300px] p-6 rounded-xl flex flex-col justify-center items-center shadow-lg"
+            className="absolute w-[90%] md:w-[500px] h-[350px] p-6 rounded-xl flex flex-col justify-center items-center shadow-lg"
             style={{ backgroundColor: item.bgColor, ...getStyles(index) }}
           >
             <div className="text-white text-4xl">{item.icon}</div>
@@ -68,13 +67,13 @@ const Carousel = () => {
         ))}
       </div>
       <button
-        className="absolute left-10 bg-white p-3 rounded-full shadow-md hover:bg-gray-300 transition"
+        className="absolute left-4 bg-white p-3 rounded-full shadow-md hover:bg-gray-300 transition"
         onClick={prev}
       >
         <FaChevronLeft size={24} color="#333" />
       </button>
       <button
-        className="absolute right-10 bg-white p-3 rounded-full shadow-md hover:bg-gray-300 transition"
+        className="absolute right-4 bg-white p-3 rounded-full shadow-md hover:bg-gray-300 transition"
         onClick={next}
       >
         <FaChevronRight size={24} color="#333" />

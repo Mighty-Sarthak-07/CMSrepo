@@ -12,7 +12,7 @@ const ContactUs = () => {
   const sendEmail = (e) => {
     e.preventDefault();
 
-    // Form validation
+    
     const formData = new FormData(form.current);
     const userName = formData.get("user_name");
     const userEmail = formData.get("user_email");
@@ -23,7 +23,7 @@ const ContactUs = () => {
       return;
     }
 
-    setError(""); // Clear previous errors
+    setError(""); 
     setStatusMessage("Sending...");
 
     emailjs
@@ -33,7 +33,7 @@ const ContactUs = () => {
       .then(
         () => {
           setStatusMessage("Email has been sent successfully!");
-          form.current.reset(); // Clear the form after sending
+          form.current.reset();
         },
         (error) => {
           console.error("Email sending failed:", error);

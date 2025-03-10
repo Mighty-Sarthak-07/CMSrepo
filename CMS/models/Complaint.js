@@ -9,7 +9,6 @@ const ComplaintSchema = new mongoose.Schema({
   year: { type: String, required: true },
   complaintDetails: { type: String, required: true },
   filePath: { type: String, default: null }, // Stores file path
-  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // Links to User model
 }, { timestamps: true });
 
 const Complaint = mongoose.model("Complaint", ComplaintSchema);

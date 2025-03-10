@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import multer from "multer";
-
 import authRoutes from "./routes/auth.js";
 import adminRoutes from "./routes/admin.js";
 import complaintRoutes from "./routes/complaint.js";
@@ -13,7 +12,12 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors({ origin: "*" }));
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true,
+}));
+
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -21,7 +25,7 @@ const upload = multer();
 app.use(upload.none());
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", authenticateUser, authorizeAdmin, adminRoutes);
-app.use("/api/complaints", authenticateUser, complaintRoutes);
+app.use("/api/complaints",complaintRoutes);
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected"))

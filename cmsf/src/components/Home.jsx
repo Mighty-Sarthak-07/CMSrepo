@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { FaWifi, FaLightbulb, FaTools, FaBolt, FaBuilding } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import Carousel from "./Carousel";  
 
 const complaintsData = [
   { id: 1, title: "Wi-Fi Connectivity Issue", department: "IT Department", status: "Pending", time: "2 hours ago", icon: <FaWifi />, administrator: "Admin John Doe", details: "Wi-Fi is down in hostel area." },
@@ -64,6 +65,9 @@ const Home = () => {
           </div>
         </div>
       )}
+      <div className="mt-24">
+      <Carousel/>
+      </div>
     </div>
   );
 };

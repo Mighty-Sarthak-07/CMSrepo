@@ -2,7 +2,7 @@ import express from "express";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
-import Admin from "../models/Admin.js";
+import Admin from "../models/admin.js";
 import Complaint from "../models/Complaint.js";
 import { authenticateUser, authorizeAdmin } from "../middleware/authMiddleware.js";
 

@@ -1,198 +1,184 @@
-import React, { useState, useEffect } from "react";
-import { FaCog, FaUserEdit, FaUpload } from "react-icons/fa";
-import axios from "axios";
+import { useState, useEffect } from 'react';
 
 const AdminDashboard = () => {
-  const [admin, setAdmin] = useState(null);
-  const [complaints, setComplaints] = useState([]);
-  const [edit, setEdit] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const [showUploadPopup, setShowUploadPopup] = useState(false);
-  const [profilePic, setProfilePic] = useState("");
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  // ✅ Get token from local storage
-  const token = localStorage.getItem("token");
+  const [profileImage, setProfileImage] = useState(null);
+  const [editMode, setEditMode] = useState(false);
+  const [profile, setProfile] = useState({
+    name: 'Admin',
+    designation: 'System Administrator'
+  });
 
   useEffect(() => {
-    if (!token) {
-      console.warn("No token found, redirecting...");
-      window.location.href = "/auth"; // Redirect if not logged in
-      return;
+    const savedProfile = localStorage.getItem('userProfile');
+    const savedImage = localStorage.getItem('profileImage');
+    
+    if (savedProfile) {
+      setProfile(JSON.parse(savedProfile));
     }
+    if (savedImage) {
+      setProfileImage(savedImage);
+    }
+  }, []);
 
-    const fetchData = async () => {
-      try {
-        const headers = { Authorization: `Bearer ${token}` };
+  useEffect(() => {
+    localStorage.setItem('userProfile', JSON.stringify(profile));
+  }, [profile]);
 
-        const [complaintsResponse, adminResponse] = await Promise.all([
-          axios.get("http://localhost:5000/api/admin/complaints", { headers }),
-          axios.get("http://localhost:5000/api/admin/profile", { headers }),
-        ]);
+  useEffect(() => {
+    if (profileImage) {
+      localStorage.setItem('profileImage', profileImage);
+    }
+  }, [profileImage]);
 
-        setComplaints(complaintsResponse.data);
-        setAdmin(adminResponse.data);
-        setProfilePic(adminResponse.data.profilePic);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-
-        if (error.response && error.response.status === 401) {
-          localStorage.removeItem("token");
-          alert("Session expired. Please log in again.");
-          window.location.href = "/auth";
-        } else {
-          setError("Failed to fetch data. Please try again.");
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [token]);
-
-  // ✅ Handle profile edit toggle
-  const handleEdit = () => setEdit(!edit);
-
-  // ✅ Save profile changes
-  const handleProfileUpdate = async () => {
-    try {
-      await axios.put("http://localhost:5000/api/admin/profile", admin, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      alert("Profile updated successfully.");
-    } catch (error) {
-      console.error("Error updating profile:", error);
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileImage(reader.result);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
-  // ✅ Handle file selection
-  const handleFileChange = (event) => {
-    setSelectedFile(event.target.files[0]);
+  const handleInputChange = (e) => {
+    setProfile({
+      ...profile,
+      [e.target.name]: e.target.value
+    });
   };
-
-  // ✅ Upload profile picture
-  const handleUpload = async () => {
-    if (!selectedFile) {
-      alert("Please select an image to upload.");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("profilePic", selectedFile);
-
-    try {
-      const response = await axios.post(
-        "http://localhost:5000/api/admin/upload-profile",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      setProfilePic(response.data.url);
-      alert("Profile photo updated successfully!");
-    } catch (error) {
-      console.error("Error uploading profile photo:", error);
-    }
-
-    setShowUploadPopup(false);
-  };
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      {/* Admin Profile Section */}
-      <div className="bg-white p-4 rounded-lg shadow-md flex justify-between items-center relative">
-        <div className="flex gap-4 items-center">
-          <img src={profilePic} className="md:size-36 size-24 rounded-full" alt="Profile" />
-          <div className="flex flex-col mx-3">
-            {edit ? (
-              <>
-                <input
-                  type="text"
-                  value={admin.name}
-                  onChange={(e) => setAdmin({ ...admin, name: e.target.value })}
-                  className="border p-1 rounded"
-                />
-                <input
-                  type="text"
-                  value={admin.designation}
-                  onChange={(e) => setAdmin({ ...admin, designation: e.target.value })}
-                  className="border p-1 rounded mt-1"
-                />
-                <button onClick={handleProfileUpdate} className="mt-2 p-2 bg-blue-500 text-white rounded">
-                  Save
-                </button>
-              </>
-            ) : (
-              <>
-                <h2 className="text-xl font-bold">{admin.name}</h2>
-                <p className="text-gray-500">{admin.designation}</p>
-              </>
-            )}
+    <div className="container mx-auto p-4 max-w-6xl">
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div className="flex flex-col md:flex-row items-center gap-6">
+          <div className="relative">
+            <img 
+              src={profileImage || 'https://www.pngmart.com/files/21/Admin-Profile-PNG-Photo.png'} 
+              alt="Profile" 
+              className="w-24 h-24 rounded-full object-cover"
+            />
+            <label className="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full p-1 cursor-pointer">
+              <input 
+                type="file" 
+                className="hidden"
+                onChange={handleImageUpload}
+              />
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+              </svg>
+            </label>
           </div>
-        </div>
 
-        <div className="flex gap-2">
-          <button className="p-2 bg-gray-200 rounded" onClick={handleEdit}>
-            <FaUserEdit className="text-2xl mx-2" />
-          </button>
-          <button className="p-2 bg-black text-white rounded relative" onClick={() => setSettingsOpen(!settingsOpen)}>
-            <FaCog className="text-2xl mx-2" />
-          </button>
-
-          {settingsOpen && (
-            <div className="absolute right-0 mt-12 bg-white shadow-lg p-3 rounded-lg">
-              <button className="block w-full text-left px-3 py-2 hover:bg-gray-200" onClick={() => setShowUploadPopup(true)}>
-                Change Profile Photo
-              </button>
-            </div>
-          )}
+          <div className="flex-1 w-full">
+            {editMode ? (
+              <div className="space-y-2">
+                <input
+                  type="text"
+                  name="name"
+                  value={profile.name}
+                  onChange={handleInputChange}
+                  className="text-xl font-bold w-full p-1 border rounded"
+                />
+                <input
+                  type="text"
+                  name="designation"
+                  value={profile.designation}
+                  onChange={handleInputChange}
+                  className="text-gray-600 w-full p-1 border rounded"
+                />
+              </div>
+            ) : (
+              <div>
+                <h1 className="text-xl font-bold">{profile.name}</h1>
+                <p className="text-gray-600">{profile.designation}</p>
+              </div>
+            )}
+            
+            <button 
+              onClick={() => setEditMode(!editMode)}
+              className="mt-2 text-blue-500 hover:text-blue-700 flex items-center gap-1"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+              </svg>
+              {editMode ? 'Save' : 'Edit'}
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Profile Picture Upload Popup */}
-      {showUploadPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-            <h2 className="text-lg font-bold mb-4">Upload Profile Picture</h2>
-            <input type="file" accept="image/*" onChange={handleFileChange} className="mb-4" />
-            {selectedFile && <p className="text-sm text-gray-600">{selectedFile.name}</p>}
-            <div className="flex justify-center gap-4 mt-4">
-              <button className="px-4 py-2 bg-green-500 text-white rounded-lg" onClick={handleUpload}>
-                <FaUpload className="inline mr-2" />
-                Upload
-              </button>
-              <button className="px-4 py-2 bg-gray-500 text-white rounded-lg" onClick={() => setShowUploadPopup(false)}>
-                Cancel
-              </button>
-            </div>
+      {/* Settings Stats */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 className="text-xl font-bold mb-4">Settings</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div>
+            <p className="text-gray-600">Total Complaints</p>
+            <p className="text-2xl font-bold">5</p>
+          </div>
+          <div>
+            <p className="text-gray-600">Pending</p>
+            <p className="text-2xl font-bold">2</p>
+          </div>
+          <div>
+            <p className="text-gray-600">Resolved</p>
+            <p className="text-2xl font-bold">1</p>
+          </div>
+          <div>
+            <p className="text-gray-600">Response Rate</p>
+            <p className="text-2xl font-bold">94%</p>
           </div>
         </div>
-      )}
+      </div>
 
-      {/* Complaints Section */}
-      <div className="bg-white p-4 rounded-lg shadow-md mt-6">
-        <h2 className="text-lg font-bold mb-4">Complaints</h2>
-        {complaints.length > 0 ? (
-          <ul>
-            {complaints.map((c) => (
-              <li key={c.id} className="p-3 bg-gray-100 rounded-lg mb-2 shadow">
-                <strong>{c.title}</strong>: {c.description}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-gray-500">No complaints available.</p>
-        )}
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <h3 className="text-lg font-bold mb-4">Recent Complaints</h3>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="text-left text-gray-600 border-b">
+                <th className="pb-2">ID</th>
+                <th className="pb-2">Subject</th>
+                <th className="pb-2">Date</th>
+                <th className="pb-2">Status</th>
+                <th className="pb-2">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                { id: '#12345', subject: 'Network Connectivity Issue', date: '2024-02-20', status: 'Pending' },
+                { id: '#12344', subject: 'Software Installation Request', date: '2024-02-19', status: 'Approved' },
+                { id: '#12343', subject: 'Hardware Replacement', date: '2024-02-18', status: 'Rejected' },
+              ].map((complaint) => (
+                <tr key={complaint.id} className="border-b hover:bg-gray-50">
+                  <td className="py-3">{complaint.id}</td>
+                  <td>{complaint.subject}</td>
+                  <td>{complaint.date}</td>
+                  <td>
+                    <span className={`px-2 py-1 rounded ${complaint.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : 
+                      complaint.status === 'Approved' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                      {complaint.status}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="gap-4">
+                    <button className="text-blue-500 hover:text-blue-700 px-2 border rounded border-blue-500">
+                      Approve
+                    </button>
+                    <button className="text-green-500 hover:text-green-700 px-2 mx-2 border rounded border-green-500">
+                      Resolve
+                    </button>
+                    <button className="text-red-500 hover:text-red-700 px-2 border rounded border-red-500">
+                      Reject
+                    </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="mt-4 text-gray-600">Showing 1 to 3 of 12 results</p>
       </div>
     </div>
   );

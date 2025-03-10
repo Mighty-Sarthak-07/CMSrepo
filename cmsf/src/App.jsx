@@ -11,16 +11,17 @@ import Chatbot from "./components/Chatbot";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ContactUs from "./components/Contact";
 import FAQs from "./components/FAQs";
+import FrontPage from "./components/FrontPage";
+
 
 function App() {
-  const token = localStorage.getItem("token"); // ✅ Check if user is logged in
+  const token = localStorage.getItem("token");
 
   return (
     <Router>
       <NavBar />
       
       <Routes>
-        {/* ✅ Public Routes */}
         <Route path="/" element={
           <main className="relative min-h-screen min-w-full overflow-x-hidden p-4 sm:p-6 md:p-8 lg:p-10">
             <Home />
@@ -30,7 +31,9 @@ function App() {
         <Route path="/auth" element={<Auth />} /> 
         <Route path="/contactus" element={<ContactUs />} /> 
         <Route path="/faqs" element={<FAQs />} />
-        <Route path="/" element={<Home />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/" element={<FrontPage />} />
+
         <Route
           path="/chatbot"
           element={
@@ -40,7 +43,6 @@ function App() {
           }
         />
 
-        {/* ✅ Protected Route (Only for logged-in users) */}
         <Route 
           path="/admindashboard" 
           element={token ? <AdminDashboard /> : <Navigate to="/login" />} 
